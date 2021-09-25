@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
-import NotificationsAlert from "./NotificationsAlert";
 import FormClube from './FormClubes';
 import LineDetail from './LineDetail';
+import 'react-notifications/lib/notifications.css';
+import {NotificationManager} from 'react-notifications';
 import SideLiga from './SideLiga';
 import "./table.css";
 
@@ -23,10 +24,10 @@ const AppBody = () => {
     let clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
 
       if(pesquisa.length > 1){
-        clubes = clubes.filter((clube) => clube.nome.includes(pesquisa))
+        clubes = clubes.filter((clube) => clube.nome.toLowerCase().includes(pesquisa.toLowerCase()))
         setLista(clubes)
         if(clubes.length === 0){
-          NotificationsAlert("warning", "Atenção!", "Clube não encontrado!");
+          NotificationManager.error('Por favor, verifique sua pesquisa!', 'Clube não encontrado!', 3000);
         }
       }else{
         clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
@@ -46,15 +47,21 @@ const AppBody = () => {
     const id = Number(tr.getAttribute("data-id"));
     
     if (e.target.classList.contains("fa-edit")) {      
-      // console.log("Alterar");
-
-      // atribui a cada variável do form, o conteúdo da linha clicada
       const clubeAlt = {}
-      clubeAlt.nome = tr.cells[0].innerText;
-      clubeAlt.divisao = tr.cells[1].innerText;
-      clubeAlt.estadio = tr.cells[2].innerText;
-      clubeAlt.divida = tr.cells[3].innerText;
-      clubeAlt.id = id;
+      let clubes = JSON.parse(localStorage.getItem("clubes"));
+      for(let i = 0; i< clubes.length; i++){
+        if(clubes[i]['id'] === id){
+          
+          clubeAlt.nome = clubes[i]['nome'];
+          clubeAlt.divisao = clubes[i]['divisao'];
+          clubeAlt.estadio = clubes[i]['estadio'];
+          clubeAlt.divida = clubes[i]['divida'];
+          clubeAlt.id = id;
+        }
+      }
+      //console.log(clubes.length)
+      // atribui a cada variável do form, o conteúdo da linha clicada
+      
 
       // executa o método onLoadData do componente filho
       childRef.current.onLoadData(clubeAlt);

@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { NotificationContainer } from 'react-notifications';
 import DivMessageErrors from "./DivMessageErrors";
 import NotificationsAlert from "./NotificationsAlert";
+import 'react-notifications/lib/notifications.css';
+import {NotificationManager} from 'react-notifications';
 
 const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm();
@@ -12,6 +14,20 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
     let clubes = localStorage.getItem("clubes") ?
         JSON.parse(localStorage.getItem("clubes")) :
         "";
+
+
+    function verEstatistica(){
+      let sum = 0;
+      for(let i = 0; i< lista.length; i++){
+        sum +=Number(lista[i]['divida']);
+        console.log(Number(lista[i]['divida']))
+      }
+      let string = "Numero de clubes: " + lista.length +
+      "\nDívida total de todos os clubes: " + sum.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'});
+      NotificationManager.success(string, 'Estatísticas', 3000);
+    }
+
+
 
     // salva os dados na inclusão
 
@@ -149,8 +165,8 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
           className="form-control"
           {...register("divida", {
             required: true,
-            min: 5000,
-            max: 100000,
+            min: 0,
+            max: 1000000,
           })}
         />
         <div className="input-group-append">
@@ -163,6 +179,12 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
             type="submit"
             className={alterar ? "btn btn-success" : "d-none"}
             value="Alterar"
+          />
+          <input
+            type="button"
+            className="btn btn-danger"
+            value="Ver estatísticas"
+            onClick={verEstatistica}
           />
         </div>
       </div>
