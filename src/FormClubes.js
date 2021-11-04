@@ -5,17 +5,17 @@ import DivMessageErrors from "./DivMessageErrors";
 import NotificationsAlert from "./NotificationsAlert";
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager} from 'react-notifications';
+import {  doc, setDoc } from 'firebase/firestore/lite';
+import { db } from './Conectadb';
+
+
 
 const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm();
     const [alterar, setAlterar] = useState(false);
     const [data_id, setData_id] = useState(0);
 
-    let clubes = localStorage.getItem("clubes") ?
-        JSON.parse(localStorage.getItem("clubes")) :
-        "";
-
-
+    
     function verEstatistica(){
       let sum = 0;
       for(let i = 0; i< lista.length; i++){
@@ -41,7 +41,8 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
 
 
         // salva em localstorage os dados existentes, acrescentando o preenchido no form                    
-        localStorage.setItem("clubes", JSON.stringify([...clubes, data]));
+        /*localStorage.setItem("clubes", JSON.stringify([...clubes, data]));*/
+        setClube(db,data);
 
         // atualiza a lista
         // setLista([...lista, data]);
@@ -57,6 +58,10 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
         // contudo, esse reset() não limpa o conteúdo das variáveis (ou seja, se o usuário
         // clicar 2x sobre o adicionar, irá duplicar o registro)
         //    e.target.reset();
+    }
+
+    async function setClube(db,data) {
+      await setDoc(doc(db, "clubes", data.id + ""), data);
     }
 
     // salva os dados na alteração

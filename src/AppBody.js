@@ -5,6 +5,8 @@ import 'react-notifications/lib/notifications.css';
 import {NotificationManager} from 'react-notifications';
 import SideLiga from './SideLiga';
 import "./table.css";
+import { db } from './Conectadb';
+import { collection, getDocs } from 'firebase/firestore/lite';
 
 const AppBody = () => {
   
@@ -13,16 +15,18 @@ const AppBody = () => {
   const childRef = useRef();
 
   // "efeito colateral", ocorre quando a página é carregada
-  useEffect(() => {
-    let clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
+  useEffect(async() => {
+    //let clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
+    //let clubes = getClubes(db) ? JSON.parse(getClubes(db)): [];
+    let clubes = await getClubes(db)
     atualizaLista(clubes)
   }, []); 
 
   const setSearch = (palavra) => {
     setPesquisa(palavra)
     console.log(palavra +" - " + palavra.length)
-    let clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
-
+    //let clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
+    let clubes = lista;
       if(pesquisa.length > 1){
         clubes = clubes.filter((clube) => clube.nome.toLowerCase().includes(pesquisa.toLowerCase()))
         setLista(clubes)
@@ -30,10 +34,20 @@ const AppBody = () => {
           NotificationManager.error('Por favor, verifique sua pesquisa!', 'Clube não encontrado!', 3000);
         }
       }else{
-        clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
+        clubes = lista;
         setLista(clubes);
+        //clubes = localStorage.getItem("clubes") ? JSON.parse(localStorage.getItem("clubes")): [];
+        //setLista(clubes);
       }
   }
+
+  async function getClubes(db) {
+    const clubesCol = collection(db, 'clubes');
+    const clubesSnapshot = await getDocs(clubesCol);
+    const clubesList = clubesSnapshot.docs.map(doc => doc.data());
+    return clubesList;
+  }
+
   //clubes.filter((clube) => clube.nome.includes(pesquisa));
   
   const handleClick = e => {
