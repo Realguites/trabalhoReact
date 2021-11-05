@@ -5,7 +5,7 @@ import DivMessageErrors from "./DivMessageErrors";
 import NotificationsAlert from "./NotificationsAlert";
 import 'react-notifications/lib/notifications.css';
 import {NotificationManager} from 'react-notifications';
-import {  doc, setDoc } from 'firebase/firestore/lite';
+import {  doc, ref, setDoc } from 'firebase/firestore/lite';
 import { db } from './Conectadb';
 
 
@@ -65,10 +65,11 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
     }
 
     // salva os dados na alteração
-    const onUpdate = data => {
+    const onUpdate = async data => {
         // inicialmente, recupera os dados salvos em localStorage
-        const clubes = JSON.parse(localStorage.getItem("clubes"));
-
+        //const clubes = JSON.parse(localStorage.getItem("clubes"));
+        /*console.log(data)
+        let clubes = lista;
         // cria um novo array vazio
         const clubes2 = [];
 
@@ -85,8 +86,9 @@ const FormClubes = forwardRef(({ atualiza, lista }, ref) => {
         localStorage.setItem("clubes", JSON.stringify(clubes2));
 
         // atualiza a lista (para fazer um refresh na página)
-        // setLista(clubes2);
-        atualiza(clubes2);
+        // setLista(clubes2);*/
+        setClube(db,data)
+        //atualiza(clubes2);
 
         setValue("nome", "");
         setValue("divisao", "");

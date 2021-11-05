@@ -6,7 +6,7 @@ import {NotificationManager} from 'react-notifications';
 import SideLiga from './SideLiga';
 import "./table.css";
 import { db } from './Conectadb';
-import { collection, getDocs } from 'firebase/firestore/lite';
+import { doc, collection, getDocs, deleteDoc } from 'firebase/firestore/lite';
 
 const AppBody = () => {
   
@@ -47,10 +47,13 @@ const AppBody = () => {
     const clubesList = clubesSnapshot.docs.map(doc => doc.data());
     return clubesList;
   }
+  async function deleteClubes(db, id) {
+    await deleteDoc(doc(db, "clubes", id + ""));
+  }
 
   //clubes.filter((clube) => clube.nome.includes(pesquisa));
   
-  const handleClick = e => {
+  const handleClick = async e => {
     // obtém a linha da tabela sobre a qual o usuário clicou, ou seja, qual elemento tr foi clicado
     const tr = e.target.closest("tr");
 
@@ -62,10 +65,10 @@ const AppBody = () => {
     
     if (e.target.classList.contains("fa-edit")) {      
       const clubeAlt = {}
-      let clubes = JSON.parse(localStorage.getItem("clubes"));
+      let clubes = lista;
+
       for(let i = 0; i< clubes.length; i++){
         if(clubes[i]['id'] === id){
-          
           clubeAlt.nome = clubes[i]['nome'];
           clubeAlt.divisao = clubes[i]['divisao'];
           clubeAlt.estadio = clubes[i]['estadio'];
@@ -88,12 +91,15 @@ const AppBody = () => {
 
       if (window.confirm(`Confirma a exclusão do clube "${nome}"?`)) {
         // aplica um filtro para recuperar todas as linhas, exceto aquela que será excluída
-        const novaLista = lista.filter((clube) => {return clube.id !== id});
+        //const novaLista = lista.filter((clube) => {return clube.id !== id});
 
         // atualiza o localStorage
-        localStorage.setItem("clubes", JSON.stringify(novaLista));
+        //localStorage.setItem("clubes", JSON.stringify(novaLista));
 
         // atualiza a tabela (refresh)
+        deleteClubes(db, id);
+        const novaLista = lista.filter((clube) => {return clube.id !== id});
+
         setLista(novaLista);
       }
     }
